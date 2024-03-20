@@ -13,7 +13,7 @@ contract JKPAdapter {
         owner = msg.sender;
     }
 
-    function getAddress() external view returns (address) {
+    function getImplementationAddress() external view returns (address) {
         return address(joKenPo);
     }
 
@@ -55,10 +55,7 @@ contract JKPAdapter {
     }
 
     function upgrade(address newImplementation) external restricted {
-        require(
-            newImplementation != address(0),
-            "Empty address is not permitted"
-        );
+        require(newImplementation != address(0), "The address is required");
 
         joKenPo = IJoKenPo(newImplementation);
     }
