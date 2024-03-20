@@ -3,6 +3,7 @@
 pragma solidity ^0.8.24;
 
 import "./IJoKenPo.sol";
+import "./JKPLibrary.sol";
 
 contract JKPAdapter {
     IJoKenPo private joKenPo;
@@ -10,6 +11,21 @@ contract JKPAdapter {
 
     constructor() {
         owner = msg.sender;
+    }
+
+    function getAddress() external view returns (address) {
+        return address(joKenPo);
+    }
+
+    function getResult() external view upgraded returns (string memory) {
+        return joKenPo.getResult();
+    }
+
+    function play(JKPLibrary.Options newChoice) external payable upgraded {}
+
+    modifier upgraded() {
+        require(address(joKenPo) != address(0), "You must upgrade first");
+        _;
     }
 
     function upgrade(address newImplementation) external {
