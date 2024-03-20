@@ -2,14 +2,9 @@
 
 pragma solidity ^0.8.24;
 
-contract JoKenPo {
-    enum Options {
-        NONE,
-        ROCK,
-        PAPER,
-        SCISSORS
-    } //0, 1, 2, 3
+import "./IJoKenPo.sol";
 
+contract JoKenPo is IJoKenPo {
     Options private choice1 = Options.NONE;
     address private player1;
     string private result = "";
@@ -17,11 +12,6 @@ contract JoKenPo {
     uint8 private commission = 10; //percent
 
     address payable private immutable owner;
-
-    struct Player {
-        address wallet;
-        uint32 wins;
-    }
 
     Player[] public players;
 
@@ -37,6 +27,10 @@ contract JoKenPo {
         return bid;
     }
 
+    function getCommission() external view returns (uint8) {
+        return commission;
+    }
+
     function setBid(uint256 newBid) external {
         require(msg.sender == owner, "You do not have permission");
         require(
@@ -44,10 +38,6 @@ contract JoKenPo {
             "You cannot change the bid with a game in progress"
         );
         bid = newBid;
-    }
-
-    function getCommission() external view returns (uint8) {
-        return commission;
     }
 
     function setCommission(uint8 newCommission) external {
