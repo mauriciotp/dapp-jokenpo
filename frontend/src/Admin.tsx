@@ -1,5 +1,12 @@
+import Header from './Header'
+
 function Admin() {
-  return <div>Admin Page</div>
+  return (
+    <div className="container">
+      <Header />
+      <main>Admin Page</main>
+    </div>
+  )
 }
 
 export default Admin

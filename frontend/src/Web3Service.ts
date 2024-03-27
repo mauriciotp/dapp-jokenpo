@@ -25,6 +25,7 @@ export async function doLogin(): Promise<LoginResult> {
   const web3 = getWeb3()
   const accounts = await web3.eth.requestAccounts()
   const checksumAddress = web3.utils.toChecksumAddress(accounts[0])
+  console.log('doing login')
 
   if (!accounts || !accounts.length)
     throw new Error('Wallet not found/allowed.')
@@ -39,4 +40,9 @@ export async function doLogin(): Promise<LoginResult> {
     account: checksumAddress,
     isAdmin: checksumAddress === ownerAddress,
   } as LoginResult
+}
+
+export function doLogout() {
+  localStorage.removeItem('account')
+  localStorage.removeItem('isAdmin')
 }

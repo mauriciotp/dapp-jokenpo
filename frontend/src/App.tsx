@@ -1,5 +1,12 @@
+import Header from './Header'
+
 function App() {
-  return <div>App Page</div>
+  return (
+    <div className="container">
+      <Header />
+      <main>Admin Page</main>
+    </div>
+  )
 }
 
 export default App
