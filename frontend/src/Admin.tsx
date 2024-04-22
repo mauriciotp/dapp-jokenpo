@@ -1,10 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from './Header'
-import { Dashboard } from './Web3Service'
+import {
+  Dashboard,
+  getDashboard,
+  upgrade,
+  setBid,
+  setCommission,
+} from './Web3Service'
 
 function Admin() {
   const [message, setMessage] = useState('')
   const [dashboard, setDashboard] = useState<Dashboard>()
+
+  useEffect(() => {
+    getDashboard()
+      .then((dashboard) => setDashboard(dashboard))
+      .catch((err) => setMessage(err.message))
+  }, [])
 
   function onInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     setDashboard((prevState) => ({
@@ -14,15 +26,27 @@ function Admin() {
   }
 
   function onUpgradeClick() {
-    alert('upgrade')
+    if (!dashboard?.address) return setMessage('Address is required!')
+
+    upgrade(dashboard?.address)
+      .then((tx) => setMessage('Success. Tx: ' + tx))
+      .catch((err) => setMessage(err.message))
   }
 
   function onChangeCommissionClick() {
-    alert('commission')
+    if (!dashboard?.commission) return setMessage('Commission is required!')
+
+    setCommission(dashboard?.commission)
+      .then((tx) => setMessage('Success. Tx: ' + tx))
+      .catch((err) => setMessage(err.message))
   }
 
   function onChangeBidClick() {
-    alert('bid')
+    if (!dashboard?.bid) return setMessage('Bid is required!')
+
+    setBid(dashboard?.bid)
+      .then((tx) => setMessage('Success. Tx: ' + tx))
+      .catch((err) => setMessage(err.message))
   }
 
   return (
@@ -54,7 +78,7 @@ function Admin() {
                   type="number"
                   className="form-control"
                   id="bid"
-                  value={dashboard?.bid || ''}
+                  value={String(dashboard?.bid) || ''}
                   onChange={onInputChange}
                 />
                 <span className="input-group-text bg-secondary">wei</span>
@@ -76,7 +100,7 @@ function Admin() {
                   type="number"
                   className="form-control"
                   id="commission"
-                  value={dashboard?.commission || ''}
+                  value={Number(dashboard?.commission) || ''}
                   onChange={onInputChange}
                 />
                 <span className="input-group-text bg-secondary">%</span>

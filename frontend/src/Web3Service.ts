@@ -1,5 +1,6 @@
 import Web3 from 'web3'
 import ABI from './abi.json'
+import { AbiType } from './AbiType'
 
 const ADAPTER_ADDRESS = `${import.meta.env.VITE_CONTRACT_ADDRESS}`
 
@@ -11,7 +12,7 @@ function getWeb3(): Web3 {
 
 function getContract(web3?: Web3) {
   if (!web3) web3 = getWeb3()
-  return new web3.eth.Contract(ABI, ADAPTER_ADDRESS, {
+  return new web3.eth.Contract(ABI as AbiType, ADAPTER_ADDRESS, {
     from: localStorage.getItem('account') || undefined,
   })
 }
@@ -51,4 +52,39 @@ export type Dashboard = {
   bid?: string
   commission?: number
   address?: string
+}
+
+export async function getDashboard(): Promise<Dashboard> {
+  const contract = getContract()
+  const address = await contract.methods.getImplementationAddress().call()
+
+  if (/^(0x0+)$/.test(address)) {
+    return {
+      bid: Web3.utils.toWei('0.01', 'ether'),
+      commission: 10,
+      address,
+    } as Dashboard
+  }
+
+  const bid = await contract.methods.getBid().call()
+  const commission = await contract.methods.getCommission().call()
+  return { bid, commission, address } as Dashboard
+}
+
+export async function upgrade(newContract: string): Promise<string> {
+  const contract = getContract()
+  const tx = await contract.methods.upgrade(newContract).send()
+  return tx.transactionHash
+}
+
+export async function setCommission(newCommission: number): Promise<string> {
+  const contract = getContract()
+  const tx = await contract.methods.setCommission(newCommission).send()
+  return tx.transactionHash
+}
+
+export async function setBid(newBid: string): Promise<string> {
+  const contract = getContract()
+  const tx = await contract.methods.setBid(newBid).send()
+  return tx.transactionHash
 }
