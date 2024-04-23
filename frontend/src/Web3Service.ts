@@ -88,3 +88,16 @@ export async function setBid(newBid: string): Promise<string> {
   const tx = await contract.methods.setBid(newBid).send()
   return tx.transactionHash
 }
+
+export type Leaderboard = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  players?: any[]
+  result?: string
+}
+
+export enum Options {
+  NONE,
+  PAPER,
+  ROCK,
+  SCISSORS,
+} // 0,1,2,3
