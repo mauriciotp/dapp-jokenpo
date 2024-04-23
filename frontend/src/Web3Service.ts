@@ -89,15 +89,39 @@ export async function setBid(newBid: string): Promise<string> {
   return tx.transactionHash
 }
 
+export type Player = {
+  wallet: string
+  wins: bigint
+}
+
 export type Leaderboard = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  players?: any[]
+  players?: Player[]
   result?: string
 }
 
 export enum Options {
   NONE,
-  PAPER,
   ROCK,
+  PAPER,
   SCISSORS,
 } // 0,1,2,3
+
+export async function play(option: Options): Promise<string> {
+  const web3 = getWeb3()
+  const contract = getContract(web3)
+  const bid = await contract.methods.getBid().call()
+  const tx = await contract.methods.play(option).send({ value: bid.toString() })
+  return tx.transactionHash
+}
+
+export async function getResult(): Promise<string> {
+  const contract = getContract()
+  return contract.methods.getResult().call()
+}
+
+export async function getLeaderboard(): Promise<Leaderboard> {
+  const contract = getContract()
+  const players = await contract.methods.getLeaderboard().call()
+  const result = await contract.methods.getResult().call()
+  return { players, result } as Leaderboard
+}
