@@ -4,8 +4,9 @@ import {
   Leaderboard,
   Options,
   getLeaderboard,
-  getResult,
   play,
+  listenEvent,
+  getBestPlayers,
 } from './Web3Service'
 
 function App() {
@@ -16,14 +17,17 @@ function App() {
     getLeaderboard()
       .then((leaderboard) => setLeaderboard(leaderboard))
       .catch((err) => setMessage(err.message))
+
+    listenEvent((result: string) => {
+      getBestPlayers()
+        .then((players) => setLeaderboard({ players, result } as Leaderboard))
+        .catch((err) => setMessage(err.message))
+    })
   }, [])
 
   function onPlay(option: Options) {
     setLeaderboard({ ...leaderboard, result: 'Sending your choice...' })
-    play(option)
-      .then(() => getResult())
-      .then((result) => setLeaderboard({ ...leaderboard, result }))
-      .catch((err) => setMessage(err.message))
+    play(option).catch((err) => setMessage(err.message))
   }
 
   return (
@@ -45,7 +49,35 @@ function App() {
         </div>
         <div className="col-md-8 col-lg-12">
           <div className="row">
-            <div className="col-sm-6"></div>
+            <div className="col-sm-6">
+              <h4>Best Players</h4>
+              <div className="card card-body border-0 shadow table-wrapper table-responsive">
+                <table className="table table-hover">
+                  <thead>
+                    <tr>
+                      <th className="border-gray-200">Player</th>
+                      <th className="border-gray-200">Wins</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboard &&
+                    leaderboard.players &&
+                    leaderboard.players.length ? (
+                      leaderboard.players.map((p) => (
+                        <tr key={p.wallet}>
+                          <td>{p.wallet}</td>
+                          <td>{p.wins.toString()}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={2}>Loading...</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
             <div className="col-sm-6">
               <h4 className="mb-3">Games</h4>
               <div className="card card-body border-0 shadow">

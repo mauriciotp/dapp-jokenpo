@@ -125,3 +125,19 @@ export async function getLeaderboard(): Promise<Leaderboard> {
   const result = await contract.methods.getResult().call()
   return { players, result } as Leaderboard
 }
+
+export async function getBestPlayers(): Promise<Player[]> {
+  const contract = getContract()
+  return contract.methods.getLeaderboard().call()
+}
+
+export function listenEvent(callback: (result: string) => void) {
+  const web3 = new Web3(`${process.env.VITE_WEBSOCKET_SERVER}`)
+  const contract = getContract(web3)
+
+  contract.events
+    .Played({
+      fromBlock: 'latest',
+    })
+    .on('data', (event: any) => callback(event.returnValues.result))
+}
